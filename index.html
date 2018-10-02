@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <title>Latitude Longitude Finder</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <style>
+    .map {
+      min-height: 600px;
+    }
+    .section-title {
+      background-color: rgb(233, 236, 239);
+      margin-bottom: 15px;
+      text-align: center;
+      line-height: 1rem;
+    }
+    .section-title-text{
+      background-color: #fff;
+      color: #777;
+      display: inline-block;
+      font-weight: 700;
+      padding: 2px 8px;
+      font-size: 1.1rem;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid mt-2">
+    <div class="section-title">
+      <div class="section-title-text">Marker Coordinates</div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              Latitude
+            </div>
+          </div>
+          <input type="text" class="form-control" id="latitude" readonly>
+        </div>
+      </div>
+      <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              Longitude
+            </div>
+          </div>
+          <input type="text" class="form-control" id="longitude" readonly>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <div class="section-title-text">Map Center Coordinates</div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              Latitude
+            </div>
+          </div>
+          <input type="text" class="form-control" id="centerLatitude">
+        </div>
+      </div>
+      <div class="col">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              Longitude
+            </div>
+          </div>
+          <input type="text" class="form-control" id="centerLongitude">
+        </div>
+      </div>
+    </div>
+
+    <div id="map" class="map"></div>
+  </div>
+
+  <script>
+    let markerLatitudeInput = document.getElementById('latitude');
+    let markerLongitudeInput = document.getElementById('longitude');
+
+    let centerLatitudeInput = document.getElementById('centerLatitude');
+    let centerLongitudeInput = document.getElementById('centerLongitude');
+
+    function initMap() {
+      let center = {lat: -7.742822599999999, lng: 110.3993728};
+      let map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: center,
+        scrollwheel: false
+      });
+
+      let marker = new google.maps.Marker({
+        position: center,
+        map: map,
+        draggable: true
+      });
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          let posLat = position.coords.latitude;
+          let posLng = position.coords.longitude;
+          let pos = {
+            lat: posLat,
+            lng: posLng
+          };
+          map.setCenter(pos);
+          marker.setPosition(pos);
+          markerLatitudeInput.value = posLat;
+          markerLongitudeInput.value = posLng;
+          centerLatitudeInput.value = posLat;
+          centerLongitudeInput.value = posLng;
+        })
+      }
+
+      google.maps.event.addListener(marker, 'dragend', function (event) {
+        markerLatitudeInput.value = event.latLng.lat();
+        markerLongitudeInput.value = event.latLng.lng();
+      });
+
+      google.maps.event.addListener(map, 'center_changed', function () {
+        centerLatitudeInput.value = map.center.lat();
+        centerLongitudeInput.value = map.center.lng();
+      });
+
+      centerLatitudeInput.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode == 13) {
+          let pos = {
+            lat: parseFloat(centerLatitudeInput.value),
+            lng: parseFloat(centerLongitudeInput.value)
+          };
+          markerLatitudeInput.value = centerLatitudeInput.value;
+          markerLongitudeInput.value = centerLongitudeInput.value;
+          map.setCenter(pos);
+          marker.setPosition(pos);
+        }
+      });
+
+      centerLongitudeInput.addEventListener('keyup', function(event) {
+        event.preventDefault();
+        if (event.keyCode == 13) {
+          let pos = {
+            lat: parseFloat(centerLatitudeInput.value),
+            lng: parseFloat(centerLongitudeInput.value)
+          };
+          markerLatitudeInput.value = centerLatitudeInput.value;
+          markerLongitudeInput.value = centerLongitudeInput.value;
+          map.setCenter(pos);
+          marker.setPosition(pos);
+        }
+      });
+    }
+
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxdHuSTxlb9dOCi6E68dLXUAvZLm8NAbM&amp;callback=initMap"></script>
+</body>
+</html>
